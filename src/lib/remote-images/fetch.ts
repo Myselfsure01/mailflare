@@ -184,8 +184,12 @@ export function isPublicAddress(address: string): boolean {
 
 async function defaultResolveHost(hostname: string): Promise<string[]> {
 	const [v4, v6] = await Promise.all([queryDns(hostname, "A"), queryDns(hostname, "AAAA")]);
-	return [...v4, ...v6];
-}
+	// Self-hosted fix: DoH answers for an aliased host also carry the CNAME record
+	// itself (e.g. "q.qlogo.cn."), which is not an address. Only IP literals may
+	// take part in the public-address check, otherwise every CDN-aliased image
+	// host is rejected as "not public" and its images never load.
+	return [...v4, ...v6].filter((value) => /^\d{1,3}(?:\.\d{1,3}){3}$/.test(value) || value.includes(":"));
+	}
 
 /** A public-looking name can still resolve to a private address, so check what it resolves to. */
 async function assertPublicHost(resolve: (hostname: string) => Promise<string[]>, hostname: string): Promise<void> {
