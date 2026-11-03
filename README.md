@@ -1,3 +1,17 @@
+## 本 fork 说明
+
+这是上游 [hieunc229/mailflare](https://github.com/hieunc229/mailflare) 的个人 fork，自 2026-11-03 起以 **Docker 容器自建**方式运行（不使用 Cloudflare Workers 运行时）：
+
+- 收信：Cloudflare Email Routing → 签名中继 Worker → 本机容器
+- 发信：Resend
+- AI 助手：Cloudflare Workers AI（REST 接口），经本机 nginx 垫片接入
+
+相对上游共 6 个补丁（Team 授权解锁、远程图片检查修复与占位图、新建邮箱对话框样式、中继签名头非 ASCII 转义），补丁清单与完整的容器构建、部署方法见 **[deploy/SELFHOST-DOCKER.md](deploy/SELFHOST-DOCKER.md)**；生产编排在 `docker-compose.prod.yml`，环境变量模板在 `.env.docker.example`。
+
+以下为上游 README 原文，未作修改。
+
+---
+
 <img src="public/icon-192.png" alt="Mailflare" width="96" />
 
 
