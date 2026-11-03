@@ -1,0 +1,18 @@
+# Production deployment for this fork (as run on the owner's server since
+# 2026-11-03): prebuilt image, loopback-only port (a reverse proxy fronts it),
+# no SMTP listener — inbound mail arrives via the Cloudflare Email Routing
+# relay webhook, sending goes through Resend. See deploy/SELFHOST-DOCKER.md.
+services:
+  mailflare:
+    image: mailflare:local
+    container_name: mailflare
+    restart: unless-stopped
+    mem_limit: 512m
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file: .env.docker
+    volumes:
+      - mailflare-data:/data
+
+volumes:
+  mailflare-data:
