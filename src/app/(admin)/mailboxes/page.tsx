@@ -139,6 +139,7 @@ export default function MailboxesPage() {
 							<DialogDescription>{t("mailboxes.createDescription")}</DialogDescription>
 						</DialogHeader>
 						<div className="space-y-4">
+							{/* Self-hosted fix: this form's Select usages put the control styling on the inner <select> instead of the component's wrapper (containerClassName), which double-frames the standalone selects and breaks the email-address row; they now follow the accounts page pattern. */}
 							{mailboxes.data?.canCreateShared && (
 								<div className="space-y-2">
 									<Label htmlFor="mailbox-type">{t("mailboxes.type")}</Label>
@@ -146,7 +147,8 @@ export default function MailboxesPage() {
 										id="mailbox-type"
 										value={mailboxType}
 										onChange={(event) => setMailboxType(event.target.value as "personal" | "shared")}
-										className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm shadow-sm shadow-neutral-200/50 focus-visible:border-blue-600 focus-visible:outline-none"
+										containerClassName="h-10 w-full bg-white px-0 shadow-sm shadow-neutral-200/50 focus-within:border-blue-600"
+										className="px-3 text-sm"
 									>
 										<option value="personal">{t("mailboxes.personalInbox")}</option>
 										<option value="shared">{t("mailboxes.sharedInbox")}</option>
@@ -164,7 +166,8 @@ export default function MailboxesPage() {
 										setOwnerUserId(event.target.value);
 										if (owner) setDisplayName(owner.name);
 									}}
-									className="flex h-10 w-full rounded-md border border-neutral-200 bg-white px-3 text-sm shadow-sm shadow-neutral-200/50 focus-visible:border-blue-600 focus-visible:outline-none"
+									containerClassName="h-10 w-full bg-white px-0 shadow-sm shadow-neutral-200/50 focus-within:border-blue-600"
+									className="px-3 text-sm"
 								>
 									{mailboxOwners.map((owner) => (
 										<option key={owner.id} value={owner.id}>
@@ -200,7 +203,8 @@ export default function MailboxesPage() {
 									<span className="flex items-center text-sm text-neutral-500">@</span>
 									<Select
 										aria-label={t("accounts.domain")}
-										className="min-w-0 max-w-[55%] bg-transparent px-3 text-sm text-neutral-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+										containerClassName="min-w-0 max-w-[55%] shrink-0 rounded-none border-0 px-0"
+										className="min-w-0 bg-transparent px-3 text-sm text-neutral-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 										value={domainId}
 										onChange={(event) => setDomainId(event.target.value)}
 									>
