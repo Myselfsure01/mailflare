@@ -30,7 +30,14 @@ export default {
 			return;
 		}
 		const raw = await new Response(message.raw).arrayBuffer();
-		const headers = JSON.stringify(Object.fromEntries(message.headers));
+		// PATCH 6 (relay): the header value must be pure ASCII on the wire — non-ASCII
+		// characters (e.g. CJK display names) get mojibake'd by an intermediate layer
+		// re-encoding the value, which breaks the HMAC. Escape them as \uXXXX; the
+		// server JSON.parses them back to the identical header map.
+		const headers = JSON.stringify(Object.fromEntries(message.headers)).replace(
+			/[\u0080-\uffff]/g,
+			(c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
+		);
 		const timestamp = String(Math.floor(Date.now() / 1000));
 		let decision: Decision;
 		try {
