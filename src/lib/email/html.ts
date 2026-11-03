@@ -13,6 +13,12 @@ type Options = SanitizeEmailHtmlOptions & {
 type MailDocument = { template: HTMLTemplateElement; rootTag: string; bodyTag: string; needsWrapper: boolean };
 const nameOf = (name: string) => css.ident.decode(name).toLowerCase();
 const BLOCKED_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+// Self-hosted fix: in the reader, a remote <img> blocked by the remote-content
+// gate loses its src and renders as a broken-image frame even over a CSS
+// placeholder background; substitute this neutral avatar-style placeholder
+// image (96x96 PNG) until the reader allows remote content.
+const BLOCKED_IMAGE_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAIAAABt+uBvAAABD0lEQVR42u3asQ0CQQwEQPffERkFUAoSAQ2QE0By9vt8I20Fow/+dh3P11t+JBAAAgQIECBAgAAJIECAAAECBAiQAAI0Fuh2fwD6Fvmdc4H+0nRgiv401zLFRjqXGMVeOvVGsZ1OsVHsqFNpBKgH0HKdMiNADYCSdGqMAAECBGg0UKpOgZEvCBAgQIAOB/IWA6QPAqSTtmrYxY7YxSyrtnnXHe6DXJgBAgQIECBAgASQP2mPVX3QQX2QylVpb1l1H1QKVKCTbRQDdFKNYoZOnlGM0Ukyikk6GUaAaoEu11luFPN01hoBqgJqpbPQCBCgDkANdVYZAQIECBAgQEcDtdVZYuQLAgQIECBAgMYCfQB3TU5YUjzwcQAAAABJRU5ErkJggg==";
+
 const RESOURCE_ATTRIBUTES = ["src", "background", "poster"];
 const EDITOR_ATTRIBUTES = ["data-mailflare-src", "data-mailflare-background", "data-mailflare-poster", "data-mailflare-srcset", "data-mailflare-style", "data-mailflare-sheet"];
 
@@ -296,6 +302,7 @@ export function prepareEmailHtml(source: string, options: Options = {}) {
 			else {
 				if (options.editor) element.setAttribute(`data-mailflare-${attr}`, original);
 				element.removeAttribute(attr);
+				if (options.reader && attr === "src" && element.tagName === "IMG") element.setAttribute("src", BLOCKED_IMAGE_PLACEHOLDER);
 			}
 		}
 		if (element.hasAttribute("srcset")) {
