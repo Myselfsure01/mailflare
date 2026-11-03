@@ -5,7 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { prepareReaderEmailHtml } from "@/lib/remote-images/reader";
 import { collapseQuotedEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/quote-collapse-utils";
 
+// Self-hosted fix: an <img> whose remote source is blocked by the
+// remote-content gate has no src and would render as the browser's
+// broken-image frame; give it a neutral avatar-style placeholder instead.
+const BLOCKED_IMAGE_STYLE = `img:not([src]) { background:#eceff3 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Ccircle cx='48' cy='36' r='16' fill='%23b9c0cc'/%3E%3Cpath d='M48 56c-16 0-26 10-28 26v14h56V82c-2-16-12-26-28-26z' fill='%23b9c0cc'/%3E%3C/svg%3E") center/cover no-repeat; }`;
+
 const BASE_STYLE = `
+${BLOCKED_IMAGE_STYLE}
 :host { display:block; min-width:0; isolation:isolate; contain:paint; }
 :host(.mf-dark) { filter:invert(1) hue-rotate(180deg); }
 :host(.mf-dark) img, :host(.mf-dark) video, :host(.mf-dark) picture { filter:invert(1) hue-rotate(180deg); }
