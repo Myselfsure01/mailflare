@@ -1,0 +1,10 @@
+[Unit]
+Description=AI shim sanitizer (Workers AI chunk content coercion)
+After=network.target
+[Service]
+ExecStart=/root/node/bin/node /root/ai-shim/sanitize.js
+Restart=always
+RestartSec=3
+User=root
+[Install]
+WantedBy=multi-user.target
