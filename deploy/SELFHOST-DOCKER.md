@@ -14,6 +14,8 @@
 | 4 | 431b599 | 同上改为真实图源占位图（96×96 PNG data URI） |
 | 5 | a578b32 | 新建邮箱对话框下拉框双层边框修复 |
 | 6 | 本次提交 | **收信中继（deploy/cloudflare-email-relay）**：签名头 JSON 中的非 ASCII 字符先转义为 `\uXXXX` 再签名/发送。根因：发件人中文显示名在 Worker→源站链路上被按 Latin-1 误解码，字节变化导致 HMAC 校验 401，全部入站邮件被拒。应用侧 JSON 解析后得到同一映射，无需改动 |
+| 7 | 本次提交 | AI 助手快捷按钮中文化：`agent-panel.tsx` 里 6 个写死的英文快捷提示词改为中文（总结要点、起草回复、列出待办等）。另注意：助手默认用简体中文回复靠的是邮箱级 `mailbox_agent_settings.instructions` 数据行，不是代码补丁，重建数据库时需重设 |
+| 8 | 本次提交 | AI 用量页官方实时用量卡：新增管理员接口 `/api/admin/cf-usage`，用作用域令牌（见下「官方用量统计」）经 GraphQL `aiInferenceAdaptiveGroups` 拉取当日官方 Neurons 用量，前端卡片展示已用/免费额度/按模型明细；费率表（`agent_model_rates`）单价取自官方 REST 模型接口的 `price` 字段 |
 
 另有应用内更新工作流（bbce0cf，Workers 时期遗留）：自建 Docker 版中应用内
 更新按设计不可用，忽略即可。**注意：若将来套用上游更新，整树覆盖会冲掉
@@ -38,6 +40,16 @@
   （应用只在两者相等时借用 env 密钥）。Workers AI 的 OpenAI 兼容端点对
   `GET /v1/models` 回 405，故在本机 nginx 加垫片站点提供静态模型目录并
   转发 `/v1/*`，见 `deploy/ai-models-shim.nginx.conf`。
+- **AI 流式净化**：Workers AI 的流式响应会把纯数字 token 序列化为 JSON
+  数字（`delta.content` 为 number），触发应用侧严格校验报错。垫片站点
+  因此把 `/v1/chat/completions` 单独路由到本机净化服务
+  （`deploy/ai-shim/sanitize.js`，systemd 单元 `ai-shim.service`，监听
+  127.0.0.1:19320），把 SSE/JSON 中的数字/布尔 content 强制转回字符串
+  后再回给应用；Qwen 与 Llama 均有此问题，换模型不能解决。
+- **官方用量统计（补丁 8）**：容器 env 另加 `CF_ACCOUNT_ID` 与
+  `CF_ANALYTICS_TOKEN`（**独立的作用域令牌**，仅 Account Analytics Read
+  + Workers AI Read，账户级）。Workers AI 免费额度 10,000 Neurons/天
+  （UTC 00:00 重置），免费计划超额不收费、直接失败到次日。
 
 ## 构建容器（两条路）
 
@@ -50,7 +62,13 @@ B. 沙盒主机代建（本次生产实际路线：构建机无 Docker 守护进
 better-sqlite3`、`npm run build:node`、生产依赖裁剪（与根 Dockerfile 的
 prod-deps 阶段一致；沙盒环境需加 `npm_config_strict_ssl=false`），再用
 **`Dockerfile.runtime`** 把产物（node_modules、.next-node、dist、public、
-drizzle 等）组装成运行时镜像。两种路线产物等价。
+drizzle 等）组装成运行时镜像。两种路线产物等价。**教训（补丁 7/8 上线
+时踩过）**：若改走 `docker create/cp/commit` 在目标机上拼镜像，commit
+会把构建容器的临时 entrypoint 一并写进镜像（当时是 `sleep 1800`），
+容器起来只睡觉不起应用。当前生产靠 `docker-compose.prod.yml` 里的
+`entrypoint`/`command` 覆盖项纠正（与原镜像配置一致：
+`docker-entrypoint.sh` + `node dist/server.mjs`）；重拼镜像时务必
+用 `docker commit --change` 复位 entrypoint/cmd，或保留编排覆盖。
 
 ## 部署
 
