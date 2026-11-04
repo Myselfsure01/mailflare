@@ -62,13 +62,13 @@ export function AgentPanel({ open, fullSize, onClose, onToggleFullSize }: AgentP
 	const openEmailId = selectedMessageId && selectedMessageId in openEmailSubjects && selectedMessageId !== dismissedMessageId ? selectedMessageId : null;
 	const openEmailIdRef = useRef<string | null>(null);
 	const welcomePrompts = selectedMessageId ? [
-		{ label: t("agent.welcome.sumThis"), detail: t("agent.welcome.sumThisDetail"), prompt: `Read the thread containing email ${selectedMessageId} and summarize its key points.`, icon: FileText },
-		{ label: t("agent.welcome.reply"), detail: t("agent.welcome.replyDetail"), prompt: `Read the thread containing email ${selectedMessageId} and draft a reply.`, icon: PenLine },
-		{ label: t("agent.welcome.actionsThis"), detail: t("agent.welcome.actionsThisDetail"), prompt: `Read the thread containing email ${selectedMessageId} and list the action items.`, icon: ListChecks },
+		{ label: t("agent.welcome.sumThis"), detail: t("agent.welcome.sumThisDetail"), prompt: `阅读包含邮件 ${selectedMessageId} 的会话，总结其要点。`, icon: FileText },
+		{ label: t("agent.welcome.reply"), detail: t("agent.welcome.replyDetail"), prompt: `阅读包含邮件 ${selectedMessageId} 的会话，起草一封回复。`, icon: PenLine },
+		{ label: t("agent.welcome.actionsThis"), detail: t("agent.welcome.actionsThisDetail"), prompt: `阅读包含邮件 ${selectedMessageId} 的会话，列出其中的待办事项。`, icon: ListChecks },
 	] : [
-		{ label: t("agent.welcome.sumRecent"), detail: t("agent.welcome.sumRecentDetail"), prompt: "Summarize my recent email in this mailbox.", icon: FileText },
-		{ label: t("agent.welcome.reply"), detail: t("agent.welcome.replyDetail"), prompt: "Read my latest email and draft a reply.", icon: PenLine },
-		{ label: t("agent.welcome.actions"), detail: t("agent.welcome.actionsDetail"), prompt: "Find action items in my recent email.", icon: ListChecks },
+		{ label: t("agent.welcome.sumRecent"), detail: t("agent.welcome.sumRecentDetail"), prompt: "总结一下这个邮箱里我最近收到的邮件。", icon: FileText },
+		{ label: t("agent.welcome.reply"), detail: t("agent.welcome.replyDetail"), prompt: "阅读我最新的一封邮件，起草一封回复。", icon: PenLine },
+		{ label: t("agent.welcome.actions"), detail: t("agent.welcome.actionsDetail"), prompt: "找出我最近邮件中的待办事项。", icon: ListChecks },
 	];
 
 	const refresh = useCallback(async () => {
