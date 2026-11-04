@@ -6,6 +6,11 @@ services:
   mailflare:
     image: mailflare:local
     container_name: mailflare
+    # Explicit entrypoint/command: images assembled via docker cp/commit
+    # can inherit a stray build-container entrypoint; these two lines pin
+    # the app start regardless (same values as the original image config).
+    entrypoint: ["docker-entrypoint.sh"]
+    command: ["node", "dist/server.mjs"]
     restart: unless-stopped
     mem_limit: 512m
     ports:

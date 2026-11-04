@@ -4,9 +4,9 @@
 
 - 收信：Cloudflare Email Routing → 签名中继 Worker → 本机容器
 - 发信：Resend
-- AI 助手：Cloudflare Workers AI（REST 接口），经本机 nginx 垫片接入
+- AI 助手：Cloudflare Workers AI（REST 接口），经本机 nginx 垫片与流式响应净化服务接入
 
-相对上游共 6 个补丁（Team 授权解锁、远程图片检查修复与占位图、新建邮箱对话框样式、中继签名头非 ASCII 转义），补丁清单与完整的容器构建、部署方法见 **[deploy/SELFHOST-DOCKER.md](deploy/SELFHOST-DOCKER.md)**；生产编排在 `docker-compose.prod.yml`，环境变量模板在 `.env.docker.example`。
+相对上游共 8 个补丁（Team 授权解锁、远程图片检查修复与占位图、新建邮箱对话框样式、中继签名头非 ASCII 转义、AI 助手快捷按钮中文化、AI 用量页官方实时用量卡），补丁清单与完整的容器构建、部署方法见 **[deploy/SELFHOST-DOCKER.md](deploy/SELFHOST-DOCKER.md)**；生产编排在 `docker-compose.prod.yml`，环境变量模板在 `.env.docker.example`。
 
 以下为上游 README 原文，未作修改。
 
