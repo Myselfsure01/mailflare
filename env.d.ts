@@ -62,6 +62,8 @@ interface CloudflareEnv {
 	S3_ACCESS_KEY_ID?: string;
 	S3_SECRET_ACCESS_KEY?: string;
 	CF_TOKEN?: string;
+	/** Scoped API token (Account Analytics Read + Workers AI Read) powering the live Workers AI usage card on the AI usage page. */
+	CF_ANALYTICS_TOKEN?: string;
 	CF_API_KEY?: string;
 	CF_EMAIL?: string;
 	TURNSTILE_SECRET_KEY?: string;
